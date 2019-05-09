@@ -12,3 +12,5 @@ Upcoming
 - Flags for each supported currency being uploaded
 - Saving past currencies in .json file
 - Add button to show list of supported currencies
+
+This is not for commerical purposes, it is used for personal and learning experiences solely. 
