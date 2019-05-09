@@ -3,23 +3,23 @@ package com.example.twdcadconversion;
 import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.transition.Slide;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.ToggleButton;
-
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity{
-    private boolean twd;
+    private boolean cur0;
     Switch toggle;
-    TextView output, taiwan, canada;
+    TextView output, currency0, currency1, currType0, currType1;
     Context context;
+    double rate;
+    String currTi0 = "", currTi1 = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,72 +30,86 @@ public class MainActivity extends AppCompatActivity{
 
         Button button = (Button)findViewById(R.id.button2);
         toggle = (Switch)findViewById(R.id.switch1);
-        twd = toggle.isChecked();
+        cur0 = toggle.isChecked();
         output = (TextView)findViewById(R.id.textView3);
-        taiwan = (TextView)findViewById(R.id.editText4);
-        canada = (TextView)findViewById(R.id.editText3);
+
+        currency0 = (TextView)findViewById(R.id.editText3); // TWD
+        currType0 = (TextView)findViewById(R.id.editText2); // TWD
+        currTi0 = currType0.getText().toString();
+
+        currency1 = (TextView)findViewById(R.id.editText4); // CAD
+        currType1 = (TextView)findViewById(R.id.editText); // CAD
+        currTi1 = currType1.getText().toString();
+
+        toggle.setText("Convert " + currTi0);
 
         toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (toggle.isChecked())
-                    output.setText("to CAD");
-                else
-                    output.setText("to TWD");
+                toggle.setText("Convert " + currTi0);
             }
         });
+
+
+
 
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                convert();
                 dataGetter dg = new dataGetter();
                 FileHelper fh = new FileHelper();
 
-                String input;
-                try {
-                    input = dg.getData(context);
-                }catch(IOException e){
-                    input = fh.readFromFile(context);
-                }
+                currTi0 = currType0.getText().toString();
+                toggle.setText("Convert " + currTi0);
+                currTi1 = currType1.getText().toString();
 
-                fh.writeToFile(input, context);
-                output.setText(fh.readFromFile(context));
+                String input = fh.readFromFile(context);
+                try{
+                    if(dg.isOnline(context))
+                        input = dg.getData(context, currTi0, currTi1);
+                }catch(IOException e){
+//                    input = fh.readFromFile(context);
+                }
+                rate = Double.parseDouble(input);
+                convert();
             }
         });
 
 
     }
 
-
-
     private void convert(){
+
+
         double cash;
         if (toggle.isChecked()){
-            if (canada.getText().toString().length() >0)
-                cash = new Double(canada.getText().toString());
+            if (currency1.getText().toString().length() >0)
+                cash = new Double(currency1.getText().toString()) * rate;
             else
                 cash = 0;// convert to Taiwan dollars
 
+            output.setText(currency1.getText().toString() + " " + currTi0 +
+                    "\nis\n" + String.format("%.2f", cash) + " " + currTi1);
+            currency0.setText(Double.toString(round(cash,2)));
 
-
-
-//            output.setText("Converting to CAD " + cash);
         }else{
-            if (taiwan.getText().toString().length() >0)
-                cash = new Double(taiwan.getText().toString());
+            if (currency0.getText().toString().length() >0)
+                cash = new Double(currency0.getText().toString()) / rate;
             else
                 cash = 0;
-
-
-
-
-//            output.setText("Converting to TWD " + cash);
+            output.setText(currency0.getText() + " " + currTi1 +
+                    "\nis\n" + String.format("%.2f", cash) + " " + currTi0);
+            currency1.setText(Double.toString(round(cash, 2)));
         }
     }
 
-    private void textChange(){
-
+    private static double round(double value, int place) {
+        if (place < 0) throw new IllegalArgumentException();
+        long factor = (long) Math.pow(10, place);
+        value = value * factor;
+        long tmp = Math.round(value);
+        return (double) tmp / factor;
     }
+
 }

@@ -34,13 +34,13 @@
 
     <Switch
         android:id="@+id/switch1"
-        android:layout_width="149dp"
-        android:layout_height="68dp"
+        android:layout_width="233dp"
+        android:layout_height="71dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:text="Convert to CAD"
+        android:text="Fill"
         android:textSize="22sp"
         app:layout_constraintBottom_toTopOf="@+id/button2"
         app:layout_constraintEnd_toEndOf="parent"
@@ -60,22 +60,9 @@
         android:text="Convert"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.508"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.329" />
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:text="CAD"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toStartOf="@+id/editText3"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/editText3" />
+        app:layout_constraintVertical_bias="0.303" />
 
     <TextView
         android:id="@+id/textView3"
@@ -84,7 +71,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:text="TextView"
+        android:text=""
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -92,42 +79,61 @@
         app:layout_constraintTop_toBottomOf="@+id/button2"
         app:layout_constraintVertical_bias="0.02" />
 
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
+    <!--<ImageView-->
+        <!--android:id="@+id/flag0"-->
+        <!--android:src="@drawable/canada"-->
+        <!--android:layout_width="60dp"-->
+        <!--android:layout_height="40dp"-->
+        <!--android:layout_marginStart="8dp"-->
+        <!--android:layout_marginEnd="8dp"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintStart_toEndOf="@+id/editText3"-->
+        <!--app:layout_constraintTop_toTopOf="@+id/editText3"-->
+        <!--tools:srcCompat="@tools:sample/avatars" />-->
+
+    <!--<ImageView-->
+        <!--android:id="@+id/flag1"-->
+        <!--android:src="@drawable/taiwan"-->
+        <!--android:layout_width="60dp"-->
+        <!--android:layout_height="40dp"-->
+        <!--android:layout_marginStart="8dp"-->
+        <!--android:layout_marginTop="8dp"-->
+        <!--android:layout_marginEnd="8dp"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintStart_toEndOf="@+id/editText4"-->
+        <!--app:layout_constraintTop_toTopOf="@+id/editText4"-->
+        <!--tools:srcCompat="@tools:sample/avatars" />-->
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="55dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="28dp"
         android:layout_marginEnd="8dp"
-        android:text="TWD"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toStartOf="@+id/editText4"
+        android:ems="10"
+        android:inputType="textCapCharacters"
+        android:text="CAD"
+        android:maxLength = "3"
+        app:layout_constraintEnd_toStartOf="@+id/editText3"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/editText4" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/cadflag"
-        android:src="@drawable/canada"
-        android:layout_width="60dp"
-        android:layout_height="40dp"
+    <EditText
+        android:id="@+id/editText2"
+        android:layout_width="55dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="12dp"
         android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/editText3"
-        app:layout_constraintTop_toTopOf="@+id/editText3"
-        tools:srcCompat="@tools:sample/avatars" />
-
-    <ImageView
-        android:id="@+id/twdflag"
-        android:src="@drawable/taiwan"
-        android:layout_width="60dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/editText4"
-        app:layout_constraintTop_toTopOf="@+id/editText4"
-        tools:srcCompat="@tools:sample/avatars" />
+        android:ems="10"
+        android:inputType="textCapCharacters"
+        android:text="USD"
+        android:maxLength = "3"
+        app:layout_constraintEnd_toStartOf="@+id/editText4"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editText" />
 
 </android.support.constraint.ConstraintLayout>

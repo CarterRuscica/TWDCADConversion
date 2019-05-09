@@ -18,9 +18,7 @@ public class FileHelper {
 
     public void writeToFile(String data, Context c){
         try{
-//            OutputStreamWriter osw = new OutputStreamWriter(c.openFileOutput(file, c.MODE_PRIVATE));
             OutputStreamWriter osw = new OutputStreamWriter(c.openFileOutput(file, c.MODE_PRIVATE));
-
             osw.write(data);
             osw.close();
         }catch(IOException e){
