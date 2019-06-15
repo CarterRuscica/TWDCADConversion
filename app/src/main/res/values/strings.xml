@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">TWDCADConversion</string>
+    <string name="sixButton">6</string>
+    <string name="fourbutton">4</string>
 </resources>
