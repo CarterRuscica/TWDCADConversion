@@ -28,7 +28,7 @@ public class CurrencyArray {
         csvToObject();
     }
 
-    public Double getRate(String c1, String c2){
+    public Double getRate(String c1, String c2, double convert){
         rateObject temp;
         Double frate = 1.0, srate = 1.0;
         for (int i = 0; i < length-1; i++){
@@ -42,7 +42,7 @@ public class CurrencyArray {
                 srate = temp.rate;
             }
         }
-        return frate/srate;
+        return frate/srate*convert;
     }
 
 
