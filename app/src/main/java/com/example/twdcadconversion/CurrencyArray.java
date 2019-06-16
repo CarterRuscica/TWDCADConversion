@@ -1,5 +1,8 @@
 package com.example.twdcadconversion;
 
+import android.os.StrictMode;
+import android.util.Log;
+
 import java.io.File;
 import java.io.FileOutputStream;
 
@@ -12,9 +15,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class CurrencyArray {
-    private static final String CURL = "https://www.bankofcanada.ca/valet/observations/FX";
     private static final String INFO_URL = ("https://www.bankofcanada.ca/valet/observations/group/FX_RATES_DAILY/csv?recent=1");
-    private static final String FILENAME = "data.txt";
     private static final String DOWNLOAD_FILE = "currency.csv";
     List<rateObject> rateList = new ArrayList<>();
     private int length;
@@ -23,7 +24,8 @@ public class CurrencyArray {
         try{
             downloadData();
         }catch(IOException e){
-            System.out.println("File could not be downloaded");
+            Log.i("Downloading Data Fail ", " COULD NOT DOWNLOAD CSV");
+//            System.out.println("File could not be downloaded");
         }
         csvToObject();
     }
@@ -34,15 +36,25 @@ public class CurrencyArray {
         for (int i = 0; i < length-1; i++){
             temp = rateList.get(i);
             if (temp.c1.equals(c1)){
-                System.out.println("We have the 1st object: " + temp.toString());
+//                System.out.println("We have the 1st object: " + temp.toString());
                 frate = temp.rate;
             }
             if (temp.c1.equals(c2)){
-                System.out.println("We have the 2nd object: " + temp.toString());
+//                System.out.println("We have the 2nd object: " + temp.toString());
                 srate = temp.rate;
             }
         }
         return frate/srate*convert;
+    }
+
+    /**
+     *
+     * @return returns the data which was last updated by the program
+     */
+
+    public String getData(){
+        rateObject temp = rateList.get(0);
+        return temp.date;
     }
 
 
@@ -68,6 +80,7 @@ public class CurrencyArray {
                 }
             }
         }catch(IOException e){
+            Log.i("Object Loading Fail", "Could not find CSV");
             e.printStackTrace();
         }
     }
@@ -77,6 +90,8 @@ public class CurrencyArray {
      * @throws IOException
      */
     private void downloadData() throws IOException {
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
         URL InfoURL = new URL(INFO_URL);
         ReadableByteChannel rbc = Channels.newChannel(InfoURL.openStream());
         FileOutputStream fos = new FileOutputStream(DOWNLOAD_FILE);
@@ -93,7 +108,7 @@ public class CurrencyArray {
         while(index < size){
             temp = rateList.get(index);
             index++;
-            System.out.println("Our Objects: " + temp.toString());
+//            System.out.println("Our Objects: " + temp.toString());
         }
     }
 

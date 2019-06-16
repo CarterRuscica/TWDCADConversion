@@ -3,4 +3,5 @@
     <string name="sixButton">6</string>
     <string name="fourbutton">4</string>
     <string name="us_dollars">US DOLLARS</string>
+    <string name="update_currency">Update Currency</string>
 </resources>

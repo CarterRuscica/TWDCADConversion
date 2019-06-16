@@ -45,19 +45,41 @@ public class MainActivity extends AppCompatActivity{
             ,R.drawable.kr, R.drawable.se, R.drawable.li, R.drawable.tw, R.drawable.th, R.drawable.tr
             , R.drawable.gb, R.drawable.us, R.drawable.vn};
 
+    /**
+     * REMEMBER TO ADD CANADIAN FLAG
+     */
+    CurrencyArray ca = new CurrencyArray();
+    DoubleBuilder db = new DoubleBuilder(10, 2);
 
+    TextView firstCurrency, convertedCurrency;
+    String fC, cC;
+
+
+    private static final String FILENAME = "memCurr.txt";
 
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        /**
+         * Initializing helper objects
+         * ca being the main currency converting app
+         * db being the number handler object
+         */
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         sp1 = (Spinner)findViewById(R.id.spinner);
         adapter = new CustomAdapter(this, names, images);
 
-        sp1.setAdapter(adapter);
+        firstCurrency = (TextView)findViewById(R.id.FirstCurrency);
+        firstCurrency.setText(db.getInt().toString());
+        convertedCurrency = (TextView)findViewById(R.id.SecondCurrency);
 
+        convertedCurrency.setText(ca.getRate())
+
+        sp1.setAdapter(adapter);
         int spinnerPosition = adapter.getPosition("Chinese reminbi");
         sp1.setSelection(3);
         Log.d("System Debugging: " , "SPINNER POSITION: " +  spinnerPosition + " Is my position");
@@ -95,22 +117,50 @@ public class MainActivity extends AppCompatActivity{
 
             }
         });
-
-
-
     }
 
-
-
-
-
-    private static double round(double value, int place) {
-        if (place < 0) throw new IllegalArgumentException();
-        long factor = (long) Math.pow(10, place);
-        value = value * factor;
-        long tmp = Math.round(value);
-        return (double) tmp / factor;
+    public void buttonClick(View view){
+        switch(view.getId()){
+            case R.id.one:
+                db.addNumber(1);
+                break;
+            case R.id.two:
+                db.addNumber(2);
+                break;
+            case R.id.three:
+                db.addNumber(3);
+                break;
+            case R.id.four:
+                db.addNumber(4);
+                break;
+            case R.id.five:
+                db.addNumber(5);
+                break;
+            case R.id.six:
+                db.addNumber(6);
+                break;
+            case R.id.seven:
+                db.addNumber(7);
+                break;
+            case R.id.eight:
+                db.addNumber(8);
+                break;
+            case R.id.nine:
+                db.addNumber(9);
+                break;
+            case R.id.zero:
+                db.addNumber(0);
+                break;
+            case R.id.decimal:
+                db.toggleDecimal();
+                break;
+            case R.id.clear:
+                db.clear();
+                break;
+        }
+        firstCurrency.setText(db.getInt().toString());
     }
+
 
     private boolean isOnline(Context c){
         ConnectivityManager connMgr = (ConnectivityManager) c.getSystemService(c.CONNECTIVITY_SERVICE);
@@ -119,6 +169,28 @@ public class MainActivity extends AppCompatActivity{
             return true;
         else
             return false;
+    }
+
+    /**
+     * Update data updates currencies
+     */
+    private void updateData(){
+
+    }
+
+
+    /**
+     * save indexes saves the last user settings implemented
+     */
+    private static void saveIndexes(){
+
+    }
+
+    /**
+     * loads indexes the users used.
+     */
+    private static void loadIndexes(){
+
     }
 
 }
