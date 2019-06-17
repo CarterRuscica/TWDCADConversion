@@ -1,8 +1,12 @@
 package com.example.twdcadconversion;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -21,7 +25,7 @@ import android.widget.Toast;
 import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity{
-
+    Context context;
 
     /**
      * These variables are used for the Spinner and also converting spinner information into a readable currency
@@ -29,17 +33,17 @@ public class MainActivity extends AppCompatActivity{
     CustomAdapter adapter;
     Spinner sp1, sp2;
     //Probably could've just made an array of the currencies that match along the curreny ones by doing index
-    String[][] searchCurrency = {{"Australian dollar", "AUR"}, {"Brazilian real","BRL"},{"Chinese renminbi", "CNY"}, {"European Euro","EUR"}, {"Hong Kong dollar", "HKD"}
-            , {"Indian rupee","IDR"}, {"Indonesian rupiah","IDR"}, {"Japanese ye","JPY"} , {"Malaysian ringgit","MYR"}, {"New Zealand dollar", "NZD"}
+    String[][] searchCurrency = {{"Canadian dollar", "CAD"},{"Australian dollar", "AUR"}, {"Brazilian real","BRL"},{"Chinese renminbi", "CNY"}, {"European Euro","EUR"}, {"Hong Kong dollar", "HKD"}
+            , {"Indian rupee","IDR"}, {"Indonesian rupiah","IDR"}, {"Japanese yen","JPY"} , {"Malaysian ringgit","MYR"}, {"New Zealand dollar", "NZD"}
             , {"Norwegian krone","NOK"} , {"Peruvian new sol","PEN"} , {"Saudi riyal","SAR"} , {"Singapore dollar","SGD"} , {"South African rand", "ZAR"}
             , {"South Korean won","KRW"} , {"Swedish krona","SEK"} , {"Swiss franc","SEK"} , {"Taiwanese dollar","TWD"} , {"Thai baht","TBH"} , {"Turkish lira","TRY"}
             , {"UK Pound","GBP"} , {"US Dollar","USD"} , {"Vietnamese dong","VND"}};
-    String[] names = {"Australian dollar", "Brazilian real", "Chinese renminbi", "European Euro", "Hong Kong dollar"
-            , "Indian rupee", "Indonesian rupiah", "Japanese ye", "Malaysian ringgit", "New Zealand dollar"
+    String[] names = {"Canadian dollar","Australian dollar", "Brazilian real", "Chinese renminbi", "European Euro", "Hong Kong dollar"
+            , "Indian rupee", "Indonesian rupiah", "Japanese yen", "Malaysian ringgit", "New Zealand dollar"
             , "Norwegian krone", "Peruvian new sol", "Saudi riyal", "Singapore dollar", "South African rand"
             , "South Korean won", "Swedish krona", "Swiss franc", "Taiwanese dollar", "Thai baht", "Turkish lira"
             , "UK Pound", "US Dollar", "Vietnamese dong"};
-    int[] images = {R.drawable.au, R.drawable.br, R.drawable.cn, R.drawable.be, R.drawable.hk
+    int[] images = {R.drawable.ca, R.drawable.au, R.drawable.br, R.drawable.cn, R.drawable.be, R.drawable.hk
             ,R.drawable.in, R.drawable.id, R.drawable.jp,R.drawable.my, R.drawable.nz
             ,R.drawable.no, R.drawable.pe, R.drawable.sa, R.drawable.sg, R.drawable.za
             ,R.drawable.kr, R.drawable.se, R.drawable.li, R.drawable.tw, R.drawable.th, R.drawable.tr
@@ -49,10 +53,11 @@ public class MainActivity extends AppCompatActivity{
      * REMEMBER TO ADD CANADIAN FLAG
      */
     CurrencyArray ca = new CurrencyArray();
-    DoubleBuilder db = new DoubleBuilder(10, 2);
+    DoubleBuilder db = new DoubleBuilder(10, 2, context);
 
     TextView firstCurrency, convertedCurrency;
     String fC, cC;
+    int fCindex, cCindex;
 
 
     private static final String FILENAME = "memCurr.txt";
@@ -67,7 +72,6 @@ public class MainActivity extends AppCompatActivity{
          * db being the number handler object
          */
 
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         sp1 = (Spinner)findViewById(R.id.spinner);
@@ -77,7 +81,7 @@ public class MainActivity extends AppCompatActivity{
         firstCurrency.setText(db.getInt().toString());
         convertedCurrency = (TextView)findViewById(R.id.SecondCurrency);
 
-        convertedCurrency.setText(ca.getRate())
+//        convertedCurrency.setText(ca.getRate())
 
         sp1.setAdapter(adapter);
         int spinnerPosition = adapter.getPosition("Chinese reminbi");
@@ -86,21 +90,6 @@ public class MainActivity extends AppCompatActivity{
         String text = sp1.getSelectedItem().toString();
         Log.d("System Debugging: ", "SPINNER POSITION BY STRING " + text);
 
-
-
-
-        sp1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-                Toast.makeText(getApplicationContext(), names[position], Toast.LENGTH_LONG).show();
-                Log.d("System Spinner", sp1.getItemAtPosition(position).toString());
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
         sp2 = (Spinner)findViewById(R.id.spinner2);
         adapter = new CustomAdapter(this, names, images);
 
@@ -110,6 +99,7 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
                 Toast.makeText(getApplicationContext(), names[position], Toast.LENGTH_LONG).show();
+                updateNums();
             }
 
             @Override
@@ -117,6 +107,36 @@ public class MainActivity extends AppCompatActivity{
 
             }
         });
+        sp1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                Toast.makeText(getApplicationContext(), names[position], Toast.LENGTH_LONG).show();
+                updateNums();
+                Log.d("System Spinner", sp1.getItemAtPosition(position).toString());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
+    private void updateNums(){
+        fC = sp1.getSelectedItem().toString();
+        cC = sp2.getSelectedItem().toString();
+        for (int i = 0; i < names.length; i++){
+            if(searchCurrency[i][0].equals(fC)) {
+                fCindex = i;
+            }
+            if(searchCurrency[i][0].equals(cC)){
+                cCindex = i;
+            }
+//            Log.i("This is our array: " , i +  " : INDEX     " + searchCurrency[i][0] + ": SEARCHED CURRENCY");
+//            Log.i("GOES TO: " , searchCurrency[i][1] + ": SEARCHED CURRENCY");
+        }
+        ca.printList();
+        convertedCurrency.setText(ca.getRate(searchCurrency[fCindex][1], searchCurrency[cCindex][1], db.getInt()).toString());
     }
 
     public void buttonClick(View view){
@@ -157,8 +177,12 @@ public class MainActivity extends AppCompatActivity{
             case R.id.clear:
                 db.clear();
                 break;
+            case R.id.backspace:
+                db.backSpace();
+                break;
         }
         firstCurrency.setText(db.getInt().toString());
+        updateNums();
     }
 
 

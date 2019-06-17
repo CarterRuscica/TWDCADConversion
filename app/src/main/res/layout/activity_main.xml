@@ -54,7 +54,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:fontFamily="serif-monospace"
-        android:text="000100010001001001"
+        android:text="Empty String"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/spinner2"
@@ -70,7 +70,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:fontFamily="serif-monospace"
-        android:text="000100010001001001"
+        android:text="Empty String"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/button"
@@ -124,16 +124,21 @@
 
     <Button
         android:id="@+id/clear"
-        android:onClick="buttonClick"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:fontFamily="monospace"
-        android:textSize="25sp"
+        android:layout_width="76dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="CLR"
-        app:layout_constraintEnd_toEndOf="@+id/seven"
-        app:layout_constraintStart_toStartOf="@+id/seven"
-        app:layout_constraintTop_toBottomOf="@+id/seven" />
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:fontFamily="monospace"
+        android:onClick="buttonClick"
+        android:text="CLEAR"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toBottomOf="@+id/button"
+        app:layout_constraintEnd_toStartOf="@+id/button"
+        app:layout_constraintHorizontal_bias="0.486"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/SecondCurrency" />
 
     <Button
         android:id="@+id/two"
@@ -246,4 +251,19 @@
         app:layout_constraintEnd_toEndOf="@+id/nine"
         app:layout_constraintStart_toStartOf="@+id/nine"
         app:layout_constraintTop_toBottomOf="@+id/nine" />
+
+    <Button
+        android:id="@+id/backspace"
+        android:onClick="buttonClick"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="8dp"
+        android:padding="0dip"
+        android:text="←"
+        android:layout_gravity="center"
+        android:gravity="center_vertical|center_horizontal"
+        android:textSize="50sp"
+        app:layout_constraintEnd_toEndOf="@+id/seven"
+        app:layout_constraintStart_toStartOf="@+id/seven"
+        app:layout_constraintTop_toBottomOf="@+id/seven" />
 </android.support.constraint.ConstraintLayout>

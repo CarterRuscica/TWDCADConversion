@@ -1,5 +1,6 @@
 package com.example.twdcadconversion;
 
+import android.content.Context;
 import android.util.Log;
 
 import java.io.File;
@@ -17,7 +18,10 @@ public class DoubleBuilder {
 
     private Double currency;
 
-    public DoubleBuilder(int integerMaxLength, int decimalLength){
+    Context context;
+
+    public DoubleBuilder(int integerMaxLength, int decimalLength, Context context){
+        this.context = context;
         this.decimalMaxLength = decimalLength;
         this.integerMaxLength = integerMaxLength;
         this.currency = 0.0;
@@ -44,6 +48,7 @@ public class DoubleBuilder {
                 integerLength++;
             }
         }
+        currency = round(currency, 2);
         saveData();
     }
 
@@ -64,7 +69,7 @@ public class DoubleBuilder {
             currency -=subtract;
             currency = round(currency*Math.pow(0.1, temp), 2);
             if (decimalLength == 0){
-                decimalLength = 1;
+//                decimalLength = 0;
                 decimalMode = false;
             }
         }else{
@@ -75,6 +80,7 @@ public class DoubleBuilder {
                 currency = currency * 0.1;
             }
         }
+        currency = round(currency, 2);
         saveData();
     }
 
