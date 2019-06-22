@@ -14,6 +14,15 @@ public class CustomAdapter extends ArrayAdapter<String>{
     String[] names;
     int[] images;
 
+    /**
+     * This .java is for the sole purpose of having a scrolling option bar with flags
+     * Youtube tutorial helped in the creation of this
+     *
+     * @param context
+     * @param names
+     * @param images
+     */
+
     public CustomAdapter(Context context, String[] names, int[] images){
         super(context, R.layout.spinner_item, names);
         this.context = context;
@@ -27,8 +36,8 @@ public class CustomAdapter extends ArrayAdapter<String>{
 
             LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View row = inflater.inflate(R.layout.spinner_item, null);
-            TextView t1 = (TextView)row.findViewById(R.id.textView);
-            ImageView i1 = (ImageView)row.findViewById(R.id.imageView);
+            TextView t1 = row.findViewById(R.id.textView);
+            ImageView i1 = row.findViewById(R.id.imageView);
 
             t1.setText(names[position]);
             i1.setImageResource(images[position]);
@@ -41,8 +50,8 @@ public class CustomAdapter extends ArrayAdapter<String>{
 
         LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View row = inflater.inflate(R.layout.spinner_item, null);
-        TextView t1 = (TextView)row.findViewById(R.id.textView);
-        ImageView i1 = (ImageView)row.findViewById(R.id.imageView);
+        TextView t1 = row.findViewById(R.id.textView);
+        ImageView i1 = row.findViewById(R.id.imageView);
 
         t1.setText(names[position]);
         i1.setImageResource(images[position]);

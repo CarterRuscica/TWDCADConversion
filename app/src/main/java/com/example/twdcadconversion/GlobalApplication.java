@@ -8,6 +8,9 @@ import android.content.Context;
  */
 
 public class GlobalApplication extends Application {
+    /**
+     * This method was because context was not available throughout
+     */
 
     private static Context appContext;
 

@@ -3,29 +3,27 @@ package com.example.twdcadconversion;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Scanner;
 
 public class MainActivity extends AppCompatActivity{
     Context context;
+    private static final String SAVEFILE = "lastuse.txt";
+
 
     /**
      * These variables are used for the Spinner and also converting spinner information into a readable currency
@@ -33,10 +31,10 @@ public class MainActivity extends AppCompatActivity{
     CustomAdapter adapter;
     Spinner sp1, sp2;
     //Probably could've just made an array of the currencies that match along the curreny ones by doing index
-    String[][] searchCurrency = {{"Canadian dollar", "CAD"},{"Australian dollar", "AUR"}, {"Brazilian real","BRL"},{"Chinese renminbi", "CNY"}, {"European Euro","EUR"}, {"Hong Kong dollar", "HKD"}
+    String[][] searchCurrency = {{"Canadian dollar", "CAD"},{"Australian dollar", "AUD"}, {"Brazilian real","BRL"},{"Chinese renminbi", "CNY"}, {"European Euro","EUR"}, {"Hong Kong dollar", "HKD"}
             , {"Indian rupee","IDR"}, {"Indonesian rupiah","IDR"}, {"Japanese yen","JPY"} , {"Malaysian ringgit","MYR"}, {"New Zealand dollar", "NZD"}
             , {"Norwegian krone","NOK"} , {"Peruvian new sol","PEN"} , {"Saudi riyal","SAR"} , {"Singapore dollar","SGD"} , {"South African rand", "ZAR"}
-            , {"South Korean won","KRW"} , {"Swedish krona","SEK"} , {"Swiss franc","SEK"} , {"Taiwanese dollar","TWD"} , {"Thai baht","TBH"} , {"Turkish lira","TRY"}
+            , {"South Korean won","KRW"} , {"Swedish krona","SEK"} , {"Swiss franc","SEK"} , {"Taiwanese dollar","TWD"} , {"Thai baht","THB"} , {"Turkish lira","TRY"}
             , {"UK Pound","GBP"} , {"US Dollar","USD"} , {"Vietnamese dong","VND"}};
     String[] names = {"Canadian dollar","Australian dollar", "Brazilian real", "Chinese renminbi", "European Euro", "Hong Kong dollar"
             , "Indian rupee", "Indonesian rupiah", "Japanese yen", "Malaysian ringgit", "New Zealand dollar"
@@ -50,56 +48,55 @@ public class MainActivity extends AppCompatActivity{
             , R.drawable.gb, R.drawable.us, R.drawable.vn};
 
     /**
-     * REMEMBER TO ADD CANADIAN FLAG
+     * Initializing helper objects
+     * ca being the main currency converting app
+     * db being the number handler object
      */
     CurrencyArray ca = new CurrencyArray();
-    DoubleBuilder db = new DoubleBuilder(10, 2, context);
+    DoubleBuilder db = new DoubleBuilder(10, 2);
 
     TextView firstCurrency, convertedCurrency;
     String fC, cC;
     int fCindex, cCindex;
 
-
     private static final String FILENAME = "memCurr.txt";
-
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        /**
-         * Initializing helper objects
-         * ca being the main currency converting app
-         * db being the number handler object
-         */
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        sp1 = (Spinner)findViewById(R.id.spinner);
+        this.context = getApplicationContext();
+
+        ActivityCompat.requestPermissions(MainActivity.this,
+                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                1);
+
+
+
+        sp1 = findViewById(R.id.spinner);
+        sp2 = findViewById(R.id.spinner2);
+
+        firstCurrency = findViewById(R.id.FirstCurrency);
+        firstCurrency.setText(db.getCurrency().toString());
+        convertedCurrency = findViewById(R.id.SecondCurrency);
+
         adapter = new CustomAdapter(this, names, images);
-
-        firstCurrency = (TextView)findViewById(R.id.FirstCurrency);
-        firstCurrency.setText(db.getInt().toString());
-        convertedCurrency = (TextView)findViewById(R.id.SecondCurrency);
-
-//        convertedCurrency.setText(ca.getRate())
-
         sp1.setAdapter(adapter);
-        int spinnerPosition = adapter.getPosition("Chinese reminbi");
-        sp1.setSelection(3);
-        Log.d("System Debugging: " , "SPINNER POSITION: " +  spinnerPosition + " Is my position");
+        sp2.setAdapter(adapter);
+
         String text = sp1.getSelectedItem().toString();
         Log.d("System Debugging: ", "SPINNER POSITION BY STRING " + text);
 
-        sp2 = (Spinner)findViewById(R.id.spinner2);
-        adapter = new CustomAdapter(this, names, images);
 
-        sp2.setAdapter(adapter);
 
         sp2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-                Toast.makeText(getApplicationContext(), names[position], Toast.LENGTH_LONG).show();
+//                Toast.makeText(getApplicationContext(), names[position], Toast.LENGTH_SHORT).show();
                 updateNums();
+                saveIndexes();
             }
 
             @Override
@@ -110,9 +107,9 @@ public class MainActivity extends AppCompatActivity{
         sp1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-                Toast.makeText(getApplicationContext(), names[position], Toast.LENGTH_LONG).show();
+//                Toast.makeText(getApplicationContext(), names[position], Toast.LENGTH_SHORT).show();
                 updateNums();
-                Log.d("System Spinner", sp1.getItemAtPosition(position).toString());
+                saveIndexes();
             }
 
             @Override
@@ -120,24 +117,14 @@ public class MainActivity extends AppCompatActivity{
 
             }
         });
+        loadIndexes();
     }
 
-    private void updateNums(){
-        fC = sp1.getSelectedItem().toString();
-        cC = sp2.getSelectedItem().toString();
-        for (int i = 0; i < names.length; i++){
-            if(searchCurrency[i][0].equals(fC)) {
-                fCindex = i;
-            }
-            if(searchCurrency[i][0].equals(cC)){
-                cCindex = i;
-            }
-//            Log.i("This is our array: " , i +  " : INDEX     " + searchCurrency[i][0] + ": SEARCHED CURRENCY");
-//            Log.i("GOES TO: " , searchCurrency[i][1] + ": SEARCHED CURRENCY");
-        }
-        ca.printList();
-        convertedCurrency.setText(ca.getRate(searchCurrency[fCindex][1], searchCurrency[cCindex][1], db.getInt()).toString());
-    }
+    /**
+     * Button method to do input based on button
+     * If button to be added remember to add buttonClick to the button in OnClick in the .xml
+     * @param view
+     */
 
     public void buttonClick(View view){
         switch(view.getId()){
@@ -175,46 +162,142 @@ public class MainActivity extends AppCompatActivity{
                 db.toggleDecimal();
                 break;
             case R.id.clear:
+                Toast.makeText(getApplicationContext(), "Cleared", Toast.LENGTH_SHORT).show();
                 db.clear();
                 break;
             case R.id.backspace:
                 db.backSpace();
                 break;
+            case R.id.swap:
+                swap();
+                saveIndexes();
+                Toast.makeText(context, "Swapped", Toast.LENGTH_LONG).show();
+                break;
         }
-        firstCurrency.setText(db.getInt().toString());
+        int decimals = db.getDecimalLength();
+        String fS = "%." + decimals + "f";
+        double val = db.getCurrency();
+
+        firstCurrency.setText(String.format(fS, val));
         updateNums();
     }
 
-
-    private boolean isOnline(Context c){
-        ConnectivityManager connMgr = (ConnectivityManager) c.getSystemService(c.CONNECTIVITY_SERVICE);
-        NetworkInfo netWorkInfo = connMgr.getActiveNetworkInfo();
-        if (netWorkInfo != null && netWorkInfo.isConnected())
-            return true;
-        else
-            return false;
+    /**
+     * Private class to swap the 2 currencies
+     */
+    private void swap(){
+        String ttext = sp1.getSelectedItem().toString();
+        String btext = sp2.getSelectedItem().toString();
+        for (int i = 0; i< names.length; i++){
+            if(names[i].equals(ttext)){ fCindex = i;}
+            if(names[i].equals(btext)){ cCindex = i;}
+        }
+        sp1.setSelection(cCindex);
+        sp2.setSelection(fCindex);
     }
 
     /**
-     * Update data updates currencies
+     * Helper method to update the currency
      */
-    private void updateData(){
+    private void updateNums() {
+        fC = sp1.getSelectedItem().toString();
+        cC = sp2.getSelectedItem().toString();
+        for (int i = 0; i < names.length; i++) {
+            if (searchCurrency[i][0].equals(fC)) {
+                this.fCindex = i;
+            }
+            if (searchCurrency[i][0].equals(cC)) {
+                cCindex = i;
+            }
+        }
+        int decimals = 2;
+        String fS = "%." + decimals + "f";
+        double val = ca.getRate(searchCurrency[fCindex][1], searchCurrency[cCindex][1], db.getCurrency());
 
+        convertedCurrency.setText(String.format(fS, val));
+//        convertedCurrency.setText(ca.getRate(searchCurrency[fCindex][1], searchCurrency[cCindex][1], db.getCurrency()).toString());
     }
 
 
     /**
      * save indexes saves the last user settings implemented
      */
-    private static void saveIndexes(){
+    private void saveIndexes(){
+        String ttext = sp1.getSelectedItem().toString();
+        String btext = sp2.getSelectedItem().toString();
+        for (int i = 0; i< names.length; i++){
+            if(names[i].equals(ttext)){ fCindex = i;}
+            if(names[i].equals(btext)){ cCindex = i;}
+        }
+
+        String storage = cCindex  + " " + fCindex;
+        try {
+//            File file = new File(Environment.getExternalStorageDirectory().toString() + "/" + SAVEFILE);
+            File file = new File(this.context.getExternalFilesDir(null), SAVEFILE);
+            if (!file.exists()){
+                file.createNewFile();
+            }
+            FileWriter writer = new FileWriter(file);
+            writer.append(storage);
+            writer.flush();
+            writer.close();
+        }catch(IOException e){
+            Log.e("Failed Saving:", " Loading Error Message : " + e.toString());
+        }
+
 
     }
 
     /**
      * loads indexes the users used.
      */
-    private static void loadIndexes(){
+    private void loadIndexes(){
+        File save = new File(Environment.getExternalStorageDirectory().toString() + "/" + SAVEFILE);
+        try{
+            Scanner saveScanner = new Scanner(save);
+            String[] nums = saveScanner.nextLine().split(" ");
+            fCindex = Integer.parseInt(nums[0]);
+            cCindex = Integer.parseInt(nums[1]);
+            sp1.setSelection(cCindex);
+            sp2.setSelection(fCindex);
+        }catch(FileNotFoundException e){
+            Log.e("Failed Loading:", " Loading Error Message : " + e.toString());
+        }
+    }
 
+    /**
+     * ASKS FOR USER PERMISSION TO WRITE DATA
+     * VERY NECESSARY UNLESS USER GOES TO SETTINGS-> APPS-> TWDCADCurrency -> PERMISSION -> ALLOW STORAGE
+     *
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 1: {
+
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Toast.makeText(MainActivity.this, "Permission denied to read your External storage", Toast.LENGTH_SHORT).show();
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
     }
 
 }

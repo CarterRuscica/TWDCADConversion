@@ -1,12 +1,10 @@
 package com.example.twdcadconversion;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -15,6 +13,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Scanner;
 
@@ -25,32 +24,111 @@ public class CurrencyArray {
 
     List<rateObject> rateList = new ArrayList<>();
     private int length;
-    Context context;
-    InputStream is;
-    File path;
+    private boolean canUpdate = true;
 
 
     public CurrencyArray(){
-        new DownloadFileFromURL().execute(INFO_URL);
-
         csvToObject();
+        rateObject temp;
+        if(rateList.size() > 1){
+            temp = rateList.get(1);
+            updateData(temp);
+        }
+        if (canUpdate == true){
+            new DownloadFileFromURL().execute(INFO_URL);
+        }
     }
 
+    /**
+     * This code is from stackoverflow
+     * https://stackoverflow.com/questions/20165564/calculating-days-between-two-dates-with-java
+     * @param day1
+     * @param day2
+     * @return
+     */
+
+    public static int daysBetween(Calendar day1, Calendar day2){
+        Calendar dayOne = (Calendar) day1.clone(),
+                dayTwo = (Calendar) day2.clone();
+
+        if (dayOne.get(Calendar.YEAR) == dayTwo.get(Calendar.YEAR)) {
+            return Math.abs(dayOne.get(Calendar.DAY_OF_YEAR) - dayTwo.get(Calendar.DAY_OF_YEAR));
+        } else {
+            if (dayTwo.get(Calendar.YEAR) > dayOne.get(Calendar.YEAR)) {
+                //swap them
+                Calendar temp = dayOne;
+                dayOne = dayTwo;
+                dayTwo = temp;
+            }
+            int extraDays = 0;
+
+            int dayOneOriginalYearDays = dayOne.get(Calendar.DAY_OF_YEAR);
+
+            while (dayOne.get(Calendar.YEAR) > dayTwo.get(Calendar.YEAR)) {
+                dayOne.add(Calendar.YEAR, -1);
+                // getActualMaximum() important for leap years
+                extraDays += dayOne.getActualMaximum(Calendar.DAY_OF_YEAR);
+            }
+
+            return extraDays - dayTwo.get(Calendar.DAY_OF_YEAR) + dayOneOriginalYearDays ;
+        }
+    }
+
+    /**
+     * This method decides whether it is necessary to download the .csv file
+     * If it is current we do not need to update
+     * If it is the weekend and we have friday's data, we do not need to update
+     * Otherwise we are going to search for the csv file
+     *
+     * @param temp
+     */
+    private void updateData(rateObject temp){
+        Calendar cal = Calendar.getInstance();
+        String[] sDate = temp.date.split("-");
+        Calendar forDays = Calendar.getInstance();
+        forDays.set(Integer.parseInt(sDate[0]), (Integer.parseInt(sDate[1])-1), Integer.parseInt(sDate[2]));
+
+        int days = daysBetween(cal, forDays);
+
+        if (cal.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY ||
+            cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY){
+//            cal.get(Calendar.DAY_OF_WEEK) == Calendar.THURSDAY){
+            if (days <= 3){
+                canUpdate = false;
+            }
+        }else if(days == 0){
+            canUpdate = false;
+        }
+    }
+
+    /**
+     *
+     * Works in the way of all currencies are USDCAD, TWDCAD, EURCAD so one way
+     * Rearranging formula we get, c1 rate / c2 rate * rate
+     * It works
+     * @param c1 - from currency
+     * @param c2 - to currency
+     * @param convert - amount of what we are going to convert
+     * @return
+     */
+
     public Double getRate(String c1, String c2, double convert){
+        if(rateList.size() < 1){
+            csvToObject();
+        }
         rateObject temp;
         Double frate = 1.0, srate = 1.0;
         for (int i = 0; i < length-1; i++){
             temp = rateList.get(i);
             if (temp.c1.equals(c1)){
-//                System.out.println("We have the 1st object: " + temp.toString());
                 frate = temp.rate;
             }
             if (temp.c1.equals(c2)){
-//                System.out.println("We have the 2nd object: " + temp.toString());
                 srate = temp.rate;
             }
         }
-        Log.i("Search Currency details", c1 + c2 + " IS THE SEARCHED CURRENCY FOR: " + convert);
+//        Log.i("Search Currency details", c1 + c2 + " IS THE SEARCHED CURRENCY FOR: " + convert);
+
         return frate/srate*convert;
     }
 
@@ -140,7 +218,6 @@ class DownloadFileFromURL extends AsyncTask<String, String, String> {
             // this will be useful so that you can show a tipical 0-100%
             // progress bar
             int lenghtOfFile = connection.getContentLength();
-
             // download the file
             InputStream input = new BufferedInputStream(url.openStream(),
                     8192);
@@ -150,7 +227,7 @@ class DownloadFileFromURL extends AsyncTask<String, String, String> {
                     .getExternalStorageDirectory().toString()
                     + "/" + DOWNLOAD_FILE);
 
-            byte data[] = new byte[1024];
+            byte[] data = new byte[1024];
 
             long total = 0;
 
@@ -180,6 +257,14 @@ class DownloadFileFromURL extends AsyncTask<String, String, String> {
     }
 }
 
+/**
+ * Rate object allows for a list of the data for the device to search for
+ * Could be optimized by not having a string date as it could be initialized to a global variable
+ * AKA
+ * define rateobject;
+ * define date object once;
+ * all dates are equal. Waste of memory.
+ */
 class rateObject{
     double rate;
     String date;
