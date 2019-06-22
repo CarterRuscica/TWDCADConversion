@@ -35,12 +35,12 @@ public class MainActivity extends AppCompatActivity{
             , {"Indian rupee","IDR"}, {"Indonesian rupiah","IDR"}, {"Japanese yen","JPY"} , {"Malaysian ringgit","MYR"}, {"New Zealand dollar", "NZD"}
             , {"Norwegian krone","NOK"} , {"Peruvian new sol","PEN"} , {"Saudi riyal","SAR"} , {"Singapore dollar","SGD"} , {"South African rand", "ZAR"}
             , {"South Korean won","KRW"} , {"Swedish krona","SEK"} , {"Swiss franc","SEK"} , {"Taiwanese dollar","TWD"} , {"Thai baht","THB"} , {"Turkish lira","TRY"}
-            , {"UK Pound","GBP"} , {"US Dollar","USD"} , {"Vietnamese dong","VND"}};
+            , {"British Pound","GBP"} , {"US Dollar","USD"} , {"Vietnamese dong","VND"}};
     String[] names = {"Canadian dollar","Australian dollar", "Brazilian real", "Chinese renminbi", "European Euro", "Hong Kong dollar"
             , "Indian rupee", "Indonesian rupiah", "Japanese yen", "Malaysian ringgit", "New Zealand dollar"
             , "Norwegian krone", "Peruvian new sol", "Saudi riyal", "Singapore dollar", "South African rand"
             , "South Korean won", "Swedish krona", "Swiss franc", "Taiwanese dollar", "Thai baht", "Turkish lira"
-            , "UK Pound", "US Dollar", "Vietnamese dong"};
+            , "British Pound", "US Dollar", "Vietnamese dong"};
     int[] images = {R.drawable.ca, R.drawable.au, R.drawable.br, R.drawable.cn, R.drawable.be, R.drawable.hk
             ,R.drawable.in, R.drawable.id, R.drawable.jp,R.drawable.my, R.drawable.nz
             ,R.drawable.no, R.drawable.pe, R.drawable.sa, R.drawable.sg, R.drawable.za
