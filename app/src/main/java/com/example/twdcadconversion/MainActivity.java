@@ -194,6 +194,7 @@ public class MainActivity extends AppCompatActivity{
         }
         sp1.setSelection(cCindex);
         sp2.setSelection(fCindex);
+        saveIndexes();
     }
 
     /**
@@ -229,11 +230,10 @@ public class MainActivity extends AppCompatActivity{
             if(names[i].equals(ttext)){ fCindex = i;}
             if(names[i].equals(btext)){ cCindex = i;}
         }
-
         String storage = cCindex  + " " + fCindex;
         try {
-//            File file = new File(Environment.getExternalStorageDirectory().toString() + "/" + SAVEFILE);
-            File file = new File(this.context.getExternalFilesDir(null), SAVEFILE);
+            File file = new File(Environment.getExternalStorageDirectory().toString() + "/" + SAVEFILE);
+//            File file = new File(this.context.getExternalFilesDir(null), SAVEFILE);
             if (!file.exists()){
                 file.createNewFile();
             }
@@ -244,8 +244,6 @@ public class MainActivity extends AppCompatActivity{
         }catch(IOException e){
             Log.e("Failed Saving:", " Loading Error Message : " + e.toString());
         }
-
-
     }
 
     /**

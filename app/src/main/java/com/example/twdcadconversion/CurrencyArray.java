@@ -28,15 +28,16 @@ public class CurrencyArray {
 
 
     public CurrencyArray(){
-        csvToObject();
         rateObject temp;
         if(rateList.size() > 1){
             temp = rateList.get(1);
             updateData(temp);
+            printList();
         }
         if (canUpdate == true){
             new DownloadFileFromURL().execute(INFO_URL);
         }
+        csvToObject();
     }
 
     /**
@@ -127,7 +128,7 @@ public class CurrencyArray {
                 srate = temp.rate;
             }
         }
-//        Log.i("Search Currency details", c1 + c2 + " IS THE SEARCHED CURRENCY FOR: " + convert);
+        Log.i("Search Currency details", c1 + c2 + " IS THE SEARCHED CURRENCY FOR: " + convert);
 
         return frate/srate*convert;
     }
@@ -154,14 +155,17 @@ public class CurrencyArray {
             Scanner input = new Scanner(csv);
             while(input.hasNext()) {
                 line = input.nextLine();
-                if (line.equals("OBSERVATIONS")){
+                if (line.contains("OBSERVATIONS")){
                     String[] csvCList = input.nextLine().split(",");
                     String[] csvRateList = input.nextLine().split(",");
                     String date = csvRateList[0];
                     rateObject temp;
                     length = csvRateList.length;
+                    double val;
                     for (int i = 1; i < length; i++){
-                        temp = new rateObject(Double.parseDouble(csvRateList[i]), csvCList[i].substring(2, 5), csvCList[i].substring(5, 8), date);
+                        val = Double.parseDouble(csvRateList[i].substring(1, csvRateList[i].length()-1));
+                        temp = new rateObject(val, csvCList[i].substring(3, 6), csvCList[i].substring(6, 9), date);
+                        printList();
                         rateList.add(temp);
                     }
                 }
@@ -178,11 +182,11 @@ public class CurrencyArray {
      */
     public void printList(){
         int size = rateList.size(), index = 0;
-        rateObject temp;
+//        rateObject temp;
         while(index < size-1){
-            temp = rateList.get(index);
+//            temp = rateList.get(index);
             index++;
-            Log.i("ARRAY CONTAINS: ", rateList.get(index).toString());
+            Log.e("ARRAY CONTAINS: ", rateList.get(index).toString());
 //            System.out.println("Our Objects: " + temp.toString());
         }
     }
